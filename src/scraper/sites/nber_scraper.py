@@ -1,6 +1,5 @@
 from ..generic_scraper import GenericScraper
-from src.scraper.external_requests import request_json, request_soup
-import requests
+from src.scraper.external_requests import request_json
 import re
 
 class NBERScraper(GenericScraper):
@@ -16,14 +15,13 @@ class NBERScraper(GenericScraper):
     def fetch_data(self):
         '''
         Sends a GET request to the source's API and parses the JSON
-        response to get title, link, date, and number for each working
-        paper entry. 
-        A secondary GET request is made to each working paper's 
-        landing page and parsed using BeautifulSoup to extract working
-        paper authors and abstracts.
+        response to get title, link, date, number, author, and abstract
+        for each working paper entry. All fields are sourced from the API
+        directly; no secondary requests are made to landing pages.
+        Note: abstracts are truncated at ~200 characters by the API.
 
-        :return: A list of dictionaries containing Title, Author, Link, 
-        Abstract, Number and Date for each working paper entry 
+        :return: A list of dictionaries containing Title, Author, Link,
+        Abstract, Number and Date for each working paper entry
         :rtype: list
         '''
         url = 'https://www.nber.org/api/v1/working_page_listing/contentType/working_paper/_/_/search?page=1&perPage=100'
@@ -49,33 +47,23 @@ class NBERScraper(GenericScraper):
             # Number
             number = el['url'].split('/papers/w')[1]
 
-            # Visit each working paper's landing page to gather abstract
-            # and author
-            # Bundle the arguments together for requests module
-            session_arguments = requests.Request(method='GET', 
-                                                url=link, 
-                                                headers=self.headers)
-            # Send request and parse soup using BeautifulSoup
-            landing_soup = request_soup(session_arguments)
+            # Authors come back from the API as a list of HTML anchor tags
+            # e.g. ['<a href="/people/david_cutler">David M. Cutler</a>', ...]
+            # Strip the tags to get plain names
+            author = ', '.join(re.sub(r'<[^>]+>', '', a) for a in el['authors'])
 
-            # Abstract
-            abstract = landing_soup.find('div', {'class': 'page-header__intro-inner'}).text.strip()
+            # Abstract is available directly from the API.
+            # Note: the API truncates abstracts at ~200 characters.
+            abstract = el['abstract']
 
-            # Author
-            raw_author_text = landing_soup.find('div', {'class': 'page-header__authors js-expandable-list'}).text.strip()
-            # Use regex to replace any sequence of whitespace characters (space, 
-            # newline, etc.) with a single space
-            clean_author_text = re.sub(r'\s+', ' ', raw_author_text)
-
-            # Append title, link, date, number, abstract, clean_author_text
-            # to `data`
+            # Append title, link, date, number, abstract, author to `data`
             data.append({
                 'Title': title,
                 'Link': link,
                 'Date': date,
                 'Number': number,
                 'Abstract': abstract,
-                'Author': clean_author_text
+                'Author': author
             })
         
         return(data)

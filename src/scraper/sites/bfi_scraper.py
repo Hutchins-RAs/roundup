@@ -32,31 +32,40 @@ class BFIScraper(GenericScraper):
         # Send request and get soup
         soup = request_soup(session_arguments)
 
-        elements = soup.select('div.teaser.teaser--working-paper ')
+        elements = soup.find('main').select('div.card.is-horizontal')
 
-        # Get titles, links, dates, and authors from the main website
-        # TODO: refactor so this loops only once, rather than 4x
-        Titles = [el.select('h2.teaser__title')[0].text.strip() for el in elements]
-        Links = [el.select('h2.teaser__title a')[0]['href'] for el in elements]
-        Dates = [el.select('span.meta__date')[0].text.strip() for el in elements]
-        Authors = [el.select('div.teaser__names')[0].text.strip() for el in elements]
-
-        # Get the abstracts and numbers (href attributes)
+        Titles = []
+        Links = []
+        Dates = []
+        Authors = []
         Abstracts = []
         Numbers = []
 
-        for link in Links:
-            # Bundle the arguments together for requests module
+        for el in elements:
+            title_tag = el.select_one('h3.card__title a')
+            if not title_tag:
+                continue
+            title = title_tag.text.strip()
+            # Strip query params (e.g. ?occurrence_id=0) from the link
+            link = title_tag['href'].split('?')[0]
+            date = el.select_one('span.date').text.strip()
+            author = el.select_one('div.card__authors').get_text(separator=' ', strip=True).replace('\xa0', ' ')
+
+            # Visit landing page for abstract and paper number
             session_arguments = requests.Request(method='GET', url=link, headers=self.headers)
-            # Send request and get soup
-            soup = request_soup(session_arguments)
-            
-            # Get the abstracts
-            abstract = soup.select('div.textblock')[0].text.strip()
+            landing_soup = request_soup(session_arguments)
+
+            abstract_el = landing_soup.select_one('div.textblock')
+            abstract = abstract_el.text.strip() if abstract_el else ''
+
+            pdf_tag = landing_soup.find('a', href=lambda h: h and 'BFI_WP' in h)
+            number = pdf_tag['href'].split('BFI_WP_')[1].replace('.pdf', '') if pdf_tag else None
+
+            Titles.append(title)
+            Links.append(link)
+            Dates.append(date)
+            Authors.append(author)
             Abstracts.append(abstract)
-            
-            # Get the href attribute of 'a.button'
-            number = soup.select('a.button')[0]['href'].split('BFI_WP_')[1].replace('.pdf', '')
             Numbers.append(number)
             
         # Create a dictionary of the six lists, where the keys are the column names.

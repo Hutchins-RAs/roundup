@@ -2,6 +2,7 @@ from ..generic_scraper import GenericScraper
 from src.scraper.external_requests import request_json, request_soup
 import requests
 import re
+import time
 
 class NBERScraper(GenericScraper):
     def __init__(self):
@@ -9,7 +10,9 @@ class NBERScraper(GenericScraper):
         # Define generic headers to be used later in the class
         self.headers = {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.6261.112 Safari/537.36',
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7'
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache'
         }
 
     # Public method which is called from outside the class.
@@ -26,7 +29,7 @@ class NBERScraper(GenericScraper):
         Abstract, Number and Date for each working paper entry 
         :rtype: list
         '''
-        url = 'https://www.nber.org/api/v1/working_page_listing/contentType/working_paper/_/_/search?page=1&perPage=100'
+        url = f'https://www.nber.org/api/v1/working_page_listing/contentType/working_paper/_/_/search?page=1&perPage=100&_={int(time.time())}'
         # Send request and parse JSON-formatted response
         response = request_json(method = 'GET',
                             url = url,

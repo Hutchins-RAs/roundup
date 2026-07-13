@@ -29,7 +29,7 @@ class NBERScraper(GenericScraper):
         Abstract, Number and Date for each working paper entry 
         :rtype: list
         '''
-        url = f'https://www.nber.org/api/v1/working_page_listing/contentType/working_paper/_/_/search?page=1&perPage=100&_={int(time.time())}'
+        url = f'https://www.nber.org/api/v1/working_page_listing/contentType/working_paper/_/_/search?page=1&perPage=50&_={int(time.time())}'
         # Send request and parse JSON-formatted response
         response = request_json(method = 'GET',
                             url = url,

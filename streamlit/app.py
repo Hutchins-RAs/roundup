@@ -120,10 +120,13 @@ source_order = [
     "FED-MINNEAPOLIS", "FED-NEWYORK", "FED-PHILADELPHIA", "FED-RICHMOND",
     "FED-SANFRANCISCO", "FED-STLOUIS", "BEA", "BFI", "BIS", "BOE", "ECB", "IMF",
 ]
-sort_key = df_filtered["Source"].map(
+df_filtered = df_filtered.copy()
+df_filtered["_source_rank"] = df_filtered["Source"].map(
     lambda x: source_order.index(x) if x in source_order else len(source_order)
 )
-df_filtered = df_filtered.iloc[sort_key.argsort()]
+df_filtered = df_filtered.sort_values(
+    ["_source_rank", "est_PubDate"], ascending=[True, False]
+).drop(columns="_source_rank")
 
 num_results = len(df_filtered)
 st.write(f"{num_results} entries found")

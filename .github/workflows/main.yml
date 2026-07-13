@@ -49,8 +49,6 @@ jobs:
         git config --global user.name "GitHub Actions"
 
     - name: Commit changes
-      env:
-        TZ: America/New_York
       run: |
         CURRENT_DATE=$(date +"%m/%d/%Y")
         git add .

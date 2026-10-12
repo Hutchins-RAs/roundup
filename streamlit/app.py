@@ -41,7 +41,7 @@ st.title("Roundup: Aggregating the Latest Economics Research")
 
 st.write(
     "What are economists researching? We aggregate recent economics working papers from "
-    "20 sources, with results updated daily by 7:00 a.m. EST. "
+    "20 sources, with results updated daily by 8:30 a.m. ET. "
     "Working papers, also known as pre-print papers, are recently written research "
     "articles that have not yet been vetted by the peer review process at an academic "
     "journal."

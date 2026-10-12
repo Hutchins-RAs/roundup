@@ -1,0 +1,29 @@
+services:
+  # 1:1 copy of the Streamlit viewer. Stateless: reads data from GitHub raw.
+  - type: web
+    name: roundup
+    runtime: python
+    plan: free
+    branch: debug-gh-actions
+    buildCommand: pip install -r render/requirements-web.txt
+    startCommand: streamlit run streamlit/app.py --server.port $PORT --server.address 0.0.0.0 --server.headless true
+    healthCheckPath: /_stcore/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+
+  # Starts the GitHub Actions scrape at 8:15 AM ET. Render cron is UTC-only,
+  # so it fires at 12:15 and 13:15 UTC and the script skips the non-8 AM one.
+  - type: cron
+    name: roundup-trigger
+    runtime: python
+    plan: starter
+    branch: debug-gh-actions
+    schedule: "15 12,13 * * *"
+    buildCommand: pip install tzdata
+    startCommand: python render/trigger_scrape.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: GITHUB_TOKEN
+        sync: false

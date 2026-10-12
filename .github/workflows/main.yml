@@ -4,11 +4,38 @@ permissions: write-all
 
 on:
   schedule:
-    - cron: '40 11 * * *'  # Runs every day at 6:40 AM EST (11:40 UTC)
+    # Backup only. GitHub's scheduler is best-effort and has been starting this
+    # 3-8 hours late; the primary trigger is an external workflow_dispatch call.
+    - cron: '40 11 * * *'  # 11:40 UTC = 7:40 AM EDT / 6:40 AM EST
   workflow_dispatch:
 
+# Never run two copies at once (avoids push conflicts between triggers)
+concurrency:
+  group: daily-run
+  cancel-in-progress: false
+
 jobs:
+  # Skip the late scheduled backup if today's run already happened
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      already_ran: ${{ steps.check.outputs.already_ran }}
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 20
+    - id: check
+      run: |
+        TODAY=$(TZ=America/New_York date +"%m/%d/%Y")
+        if git log -20 --format=%s | grep -qxF "run ($TODAY)"; then
+          echo "already_ran=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "already_ran=false" >> "$GITHUB_OUTPUT"
+        fi
+
   build:
+    needs: check
+    if: github.event_name == 'workflow_dispatch' || needs.check.outputs.already_ran != 'true'
     runs-on: ubuntu-latest
 
     steps:
@@ -50,7 +77,8 @@ jobs:
 
     - name: Commit changes
       run: |
-        CURRENT_DATE=$(date +"%m/%d/%Y")
+        CURRENT_DATE=$(TZ=America/New_York date +"%m/%d/%Y")
         git add .
         git commit -m "run ($CURRENT_DATE)" -a || echo "No changes to commit"
+        git pull --rebase
         git push

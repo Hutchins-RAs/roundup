@@ -3,11 +3,13 @@ name: Daily Run
 permissions: write-all
 
 on:
-  schedule:
-    # Backup only. GitHub's scheduler is best-effort and has been starting this
-    # 3-8 hours late; the primary trigger is a cron-job.org job that calls the
-    # workflow_dispatch API at 8:15 AM ET.
-    - cron: '40 11 * * *'  # 11:40 UTC = 7:40 AM EDT / 6:40 AM EST
+  # The daily trigger is a cron-job.org job that calls the workflow_dispatch
+  # API at 8:15 AM ET. GitHub's own schedule (below) is off while we confirm
+  # cron-job.org works by itself; uncomment it to restore the backup.
+  # schedule:
+  #   # Backup only. GitHub's scheduler is best-effort and has been starting this
+  #   # 3-8 hours late.
+  #   - cron: '40 11 * * *'  # 11:40 UTC = 7:40 AM EDT / 6:40 AM EST
   workflow_dispatch:
 
 # Never run two copies at once (avoids push conflicts between triggers)

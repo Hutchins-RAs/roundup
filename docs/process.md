@@ -42,10 +42,10 @@ If any new papers were found:
 Regardless of whether new papers were found, `streamlit/last_run.txt` is updated with today's date and the count of new papers.
 
 ### 7. Git commits and pushes the changes
-After the script finishes, the workflow commits all changed files (`wp_data.csv`, `wp_ids.txt`, `scraper_status.txt`, `last_run.txt`) with the message `run (MM/DD/YYYY)` and pushes to the `debug-gh-actions` branch on GitHub. If nothing changed (no new papers, no status changes), Git skips the commit.
+After the script finishes, the workflow commits all changed files (`wp_data.csv`, `wp_ids.txt`, `scraper_status.txt`, `last_run.txt`) with the message `run (MM/DD/YYYY)` and pushes to the default branch (`main`) on GitHub. If nothing changed (no new papers, no status changes), Git skips the commit.
 
 ### 8. Streamlit reads the updated files
-The Streamlit app at `hutchins-roundup.streamlit.app` reads three files directly from the `debug-gh-actions` branch on GitHub using raw file URLs:
+The Streamlit app at `hutchins-roundup.streamlit.app` reads three files directly from the default branch (`main`) on GitHub using raw file URLs:
 
 - `data/wp_data.csv` — all papers to display
 - `streamlit/scraper_status.txt` — which scrapers are currently active

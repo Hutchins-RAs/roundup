@@ -4,7 +4,8 @@ services:
     name: roundup
     runtime: python
     plan: free
-    branch: debug-gh-actions
+    # No branch: Render uses the repo's default branch
+    # branch: debug-gh-actions
     buildCommand: pip install -r render/requirements-web.txt
     startCommand: streamlit run streamlit/app.py --server.port $PORT --server.address 0.0.0.0 --server.headless true
     healthCheckPath: /_stcore/health
@@ -18,7 +19,8 @@ services:
     name: roundup-trigger
     runtime: python
     plan: starter
-    branch: debug-gh-actions
+    # No branch: Render uses the repo's default branch
+    # branch: debug-gh-actions
     schedule: "15 12,13 * * *"
     buildCommand: pip install tzdata
     startCommand: python render/trigger_scrape.py

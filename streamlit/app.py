@@ -3,8 +3,8 @@ import pandas as pd
 import requests
 from datetime import datetime, timedelta
 
-_BRANCH = "debug-gh-actions"
-_RAW = f"https://raw.githubusercontent.com/Hutchins-RAs/roundup/{_BRANCH}"
+# HEAD resolves to the repo's default branch, so this survives branch renames
+_RAW = "https://raw.githubusercontent.com/Hutchins-RAs/roundup/HEAD"
 
 
 def load_df():

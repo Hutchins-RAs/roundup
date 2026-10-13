@@ -3,6 +3,7 @@
 Run by the Render cron job. Needs GITHUB_TOKEN: a fine-grained PAT scoped to
 Hutchins-RAs/roundup with Actions: Read and write.
 """
+import json
 import os
 import sys
 import urllib.request
@@ -18,17 +19,22 @@ if now.hour != 8:
 
 REPO = "Hutchins-RAs/roundup"
 WORKFLOW = "main.yml"
-BRANCH = "debug-gh-actions"
+HEADERS = {
+    "Authorization": f"Bearer {os.environ['GITHUB_TOKEN']}",
+    "Accept": "application/vnd.github+json",
+    "X-GitHub-Api-Version": "2022-11-28",
+}
+
+# Dispatch on whatever the default branch is, so a rename needs no code change
+repo_req = urllib.request.Request(f"https://api.github.com/repos/{REPO}", headers=HEADERS)
+with urllib.request.urlopen(repo_req, timeout=30) as resp:
+    BRANCH = json.load(resp)["default_branch"]
 
 req = urllib.request.Request(
     f"https://api.github.com/repos/{REPO}/actions/workflows/{WORKFLOW}/dispatches",
     data=f'{{"ref": "{BRANCH}"}}'.encode(),
     method="POST",
-    headers={
-        "Authorization": f"Bearer {os.environ['GITHUB_TOKEN']}",
-        "Accept": "application/vnd.github+json",
-        "X-GitHub-Api-Version": "2022-11-28",
-    },
+    headers=HEADERS,
 )
 try:
     with urllib.request.urlopen(req, timeout=30) as resp:

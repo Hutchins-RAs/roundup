@@ -38,7 +38,7 @@ flowchart TD
     SAVE --> GIT["Git commit & push\n'run (MM/DD/YYYY)'"]
     NOCHANGE --> GIT
 
-    GIT --> REPO["GitHub Repository\nbranch: debug-gh-actions"]
+    GIT --> REPO["GitHub Repository\nbranch: main"]
 
     %% Streamlit reads
     REPO -->|"wp_data.csv"| ST["🌐 Streamlit App\nhutchins-roundup.streamlit.app"]

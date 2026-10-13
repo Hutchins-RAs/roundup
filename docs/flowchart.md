@@ -4,7 +4,7 @@
 flowchart TD
 
     %% Trigger
-    GHA["⏰ GitHub Actions\nScheduled: 6:40 AM EST daily\nor manually triggered"]
+    GHA["⏰ GitHub Actions\nTriggered 8:15 AM ET by cron-job.org\n(GitHub schedule as backup, or manually)"]
 
     GHA --> RS["run_scraper.py\nOrchestration script"]
 

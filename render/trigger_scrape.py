@@ -1,5 +1,8 @@
 """Start the GitHub Actions scrape ("Daily Run") via workflow_dispatch.
 
+NOT IN USE (Oct 2026): Render was dropped; cron-job.org now sends this same
+request at 8:15 AM ET. Kept for reference.
+
 Run by the Render cron job. Needs GITHUB_TOKEN: a fine-grained PAT scoped to
 Hutchins-RAs/roundup with Actions: Read and write.
 """

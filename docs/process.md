@@ -9,7 +9,7 @@ The Roundup is an automated pipeline that scrapes working papers from 20 economi
 ## Daily run sequence
 
 ### 1. The daily run is triggered at 8:15 AM ET
-A free job on cron-job.org calls GitHub's `workflow_dispatch` API at 8:15 AM ET every day to start the workflow in `.github/workflows/main.yml`. The job sends `POST https://api.github.com/repos/Hutchins-RAs/roundup/actions/workflows/main.yml/dispatches` with body `{"ref":"main"}` and a fine-grained GitHub token (scoped to this repo, Actions: Read and write) in the `Authorization` header.
+A free job on cron-job.org calls GitHub's `workflow_dispatch` API at 8:15 AM ET every day to start the workflow in `.github/workflows/main.yml`. The job sends `POST https://api.github.com/repos/Hutchins-RAs/roundup/actions/workflows/main.yml/dispatches` with body `{"ref":"main"}` and a fine-grained GitHub token (scoped to this repo, Actions: Read and write) in the `Authorization` header, written as `Bearer github_pat_...` (without the `Bearer ` prefix GitHub returns 401 and the token shows "Never used").
 
 The workflow also has its own GitHub schedule as a backup, currently commented out in `main.yml` while we confirm cron-job.org works by itself. GitHub often starts scheduled runs hours late, so the backup checks for a `run (MM/DD/YYYY)` commit from today and skips the scrape if one exists. The workflow can also be triggered manually from the GitHub website (Actions tab → Daily Run → Run workflow) at any time.
 

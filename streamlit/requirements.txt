@@ -1,0 +1,5 @@
+# Viewer-only dependencies. Streamlit Cloud uses this file instead of the
+# root requirements.txt (which is the scraper's) because it sits next to app.py.
+streamlit==1.44.1
+pandas==2.2.3
+requests==2.32.3
